@@ -42,14 +42,17 @@ int main(int argc, char* argv[]){
 
         if((file = fopen(argv[2], "r")) != NULL){
             while (fgets(buffer_2, sizeof(buffer_2), file)) {
+                //printf("%s", buffer_2);
 
                 output = checkContain(buffermap, splitBuffer(buffer_2));
                 line ++;
 
+                //output = splitBuffer(buffer_2);
 
                 for(iter = output; NULL != iter; iter = iter->next){
                     if(strlen(iter->text)>0){
                         fprintf(save,"%i %s \n",line, iter->text);
+                        //printf("%i %s \n",line, iter->text);
                     }
                 }
 
@@ -57,9 +60,7 @@ int main(int argc, char* argv[]){
             fclose(file);
             fclose(save);
         }
-	deleteMap(output);
-	deleteMap(iter);
-	deleteMap(buffermap);
+
         free(buffer_1);
     }
 
