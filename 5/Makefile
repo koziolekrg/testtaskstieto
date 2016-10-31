@@ -4,11 +4,9 @@ LDLIBS=-lm
 
 all: main
 
-main: main.o splitter.o
-	$(CC) $(CFLAGS) -o main main.o splitter.o $(LDLIBS)
+main: main.o
+	$(CC) $(CFLAGS) -o main main.o $(LDLIBS)
 
-main.o: main.c splitter.h
+main.o: main.c
 	$(CC) $(CFLAGS) -c main.c
 
-splitter.o: splitter.c
-	$(CC) $(CFLAGS) -c splitter.c
