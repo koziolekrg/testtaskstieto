@@ -1,70 +1,67 @@
-#include "splitter.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 
 int main(int argc, char* argv[]){
 
-    if(argc<3){
-        printf("Please type file name");
-    }
-    else{
-        FILE *file;
-        FILE *save;
+    FILE *input, *output;
+    long fileSize;
+    char **set ;
+    char *buffer, *split;
+    int iter = 1;
 
-        long fileSize;
 
-        char *buffer_1;
-        char buffer_2 [256];
 
-        Map* output;
-        Map* iter;
-        Map* buffermap;
-        size_t len;
-        int line;
-        line = 0;
+    if((input = fopen(argv[1], "r")) != NULL){
 
-        if((file = fopen(argv[1], "r")) != NULL){
-            fseek(file, 0L, SEEK_END);
-            fileSize = ftell(file);
-            rewind(file);
+        fseek(input, 0L, SEEK_END);
+        fileSize = ftell(input);
+        rewind(input);
 
-            buffer_1 = (char*) calloc(1, fileSize+1);
+        set = malloc(sizeof(char*)*fileSize);
+        buffer = (char*) calloc(1, fileSize+1);
 
-            if(buffer_1 != NULL){
-                fgets(buffer_1, fileSize ,file);
+        fgets(buffer, fileSize ,input);
+        split = strtok(buffer, "},{");
+        set[0]="";
 
-            }
-            fclose(file);
-            buffermap = splitBuffer(buffer_1);
+        while(split != NULL){
+             set[iter] = split;
+             split = strtok(NULL, "},{");
+             iter++;
         }
 
+        fclose(input);
+    }
 
-        save = fopen("output", "w");
+    if((output = fopen("output", "w")) != NULL){
+        int i,j, max_bits;
+        short bit;
 
-        if((file = fopen(argv[2], "r")) != NULL){
-            while (fgets(buffer_2, sizeof(buffer_2), file)) {
-                //printf("%s", buffer_2);
+        for(i=0; i< pow(2,iter-1); i++){
 
-                output = checkContain(buffermap, splitBuffer(buffer_2));
-                line ++;
+            fprintf(output, "{");
+            max_bits = floor(log2(i));
 
-                //output = splitBuffer(buffer_2);
+            for(j=0; j<= max_bits; j++){
+                bit = (i>>j) & 1;
 
-                for(iter = output; NULL != iter; iter = iter->next){
-                    if(strlen(iter->text)>0){
-                        fprintf(save,"%i %s \n",line, iter->text);
-                        //printf("%i %s \n",line, iter->text);
-                    }
+                if(bit == 1){
+                    fprintf(output,"%s", set[j+1]);
+                }
+                if(j<max_bits && bit == 1){
+                    fprintf(output,",");
                 }
 
+
             }
-            fclose(file);
-            fclose(save);
+            fprintf(output,"}, ");
         }
-
-        free(buffer_1);
+        fclose(output);
     }
-
-
-
+    printf("Subsets generated and wrote to file [output]");
     return 0;
 }
